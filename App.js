@@ -2,8 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  NativeModules,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -52,19 +50,6 @@ const LOTTO_YEAR_URL = 'https://lotto.gon.ai.kr/lotto/year/';
 const FIRST_DRAW_DATE = new Date(2002, 11, 7);
 const DRAW_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 const FIRST_DRAW_YEAR = 2002;
-let cachedAdsModule = null;
-
-function getAdsModule() {
-  if (cachedAdsModule) return cachedAdsModule;
-  if (!NativeModules.RNGoogleMobileAdsModule) return null;
-
-  try {
-    cachedAdsModule = require('react-native-google-mobile-ads');
-    return cachedAdsModule;
-  } catch (event) {
-    return null;
-  }
-}
 
 function getNumberColor(number) {
   if (number <= 10) return '#F8C546';
@@ -212,28 +197,6 @@ function Ball({ number, size = 44, muted = false }) {
       ]}
     >
       <Text style={[styles.ballText, { color: muted ? '#5C6675' : '#FFFFFF' }]}>{number}</Text>
-    </View>
-  );
-}
-
-function AdBanner() {
-  const adsModule = getAdsModule();
-
-  if (!adsModule?.BannerAd) return null;
-
-  const { BannerAd, BannerAdSize, TestIds } = adsModule;
-  const productionUnitId =
-    Platform.OS === 'ios'
-      ? process.env.EXPO_PUBLIC_ADMOB_BANNER_IOS
-      : process.env.EXPO_PUBLIC_ADMOB_BANNER_ANDROID;
-
-  return (
-    <View style={styles.adBannerWrap}>
-      <BannerAd
-        unitId={productionUnitId || TestIds.BANNER}
-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-        requestOptions={{ requestNonPersonalizedAdsOnly: true }}
-      />
     </View>
   );
 }
@@ -606,7 +569,6 @@ export default function App() {
               onRefresh={fetchDraws}
             />
           )}
-          <AdBanner />
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -620,14 +582,6 @@ const styles = StyleSheet.create({
   },
   app: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  adBannerWrap: {
-    minHeight: 54,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#F0F2F5',
     backgroundColor: '#FFFFFF',
   },
   header: {

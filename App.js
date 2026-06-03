@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  NativeModules,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -50,6 +52,16 @@ const LOTTO_YEAR_URL = 'https://lotto.gon.ai.kr/lotto/year/';
 const FIRST_DRAW_DATE = new Date(2002, 11, 7);
 const DRAW_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 const FIRST_DRAW_YEAR = 2002;
+const ADS_ENABLED = process.env.EXPO_PUBLIC_ENABLE_ADS === 'true';
+const ANDROID_BANNER_AD_UNIT_ID = process.env.EXPO_PUBLIC_ADMOB_BANNER_ANDROID || '';
+const IOS_BANNER_AD_UNIT_ID = process.env.EXPO_PUBLIC_ADMOB_BANNER_IOS || '';
+
+function hasGoogleMobileAdsNativeModule() {
+  return Boolean(
+    NativeModules.RNGoogleMobileAdsModule ||
+      NativeModules.RNGoogleMobileAdsNativeModule
+  );
+}
 
 function getNumberColor(number) {
   if (number <= 10) return '#F8C546';
@@ -197,6 +209,41 @@ function Ball({ number, size = 44, muted = false }) {
       ]}
     >
       <Text style={[styles.ballText, { color: muted ? '#5C6675' : '#FFFFFF' }]}>{number}</Text>
+    </View>
+  );
+}
+
+function AdBanner() {
+  const [adsModule, setAdsModule] = useState(null);
+
+  useEffect(() => {
+    if (!ADS_ENABLED || Platform.OS === 'web' || !hasGoogleMobileAdsNativeModule()) {
+      return;
+    }
+
+    try {
+      const loadedAdsModule = require('react-native-google-mobile-ads');
+      setAdsModule(loadedAdsModule);
+    } catch (event) {
+      setAdsModule(null);
+    }
+  }, []);
+
+  if (!adsModule) return null;
+
+  const unitId = Platform.OS === 'ios' ? IOS_BANNER_AD_UNIT_ID : ANDROID_BANNER_AD_UNIT_ID;
+  if (!unitId) return null;
+
+  const { BannerAd, BannerAdSize } = adsModule;
+
+  return (
+    <View style={styles.adBannerWrap} pointerEvents="box-none">
+      <BannerAd
+        unitId={unitId}
+        size={BannerAdSize.BANNER}
+        requestOptions={{ requestNonPersonalizedAdsOnly: true }}
+        onAdFailedToLoad={() => setAdsModule(null)}
+      />
     </View>
   );
 }
@@ -569,6 +616,7 @@ export default function App() {
               onRefresh={fetchDraws}
             />
           )}
+          <AdBanner />
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -582,6 +630,14 @@ const styles = StyleSheet.create({
   },
   app: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  adBannerWrap: {
+    minHeight: 54,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#F2F4F7',
     backgroundColor: '#FFFFFF',
   },
   header: {

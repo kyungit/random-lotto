@@ -1,9 +1,10 @@
 {
   "expo": {
-    "name": "\ub85c\ub610 \ubc88\ud638 \ucd94\ucca8\uae30",
+    "name": "로또 번호 추첨기",
     "slug": "random-lotto",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "backgroundColor": "#ffffff"
@@ -15,10 +16,11 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "\ub85c\ub610 QR\ucf54\ub4dc\ub97c \uc2a4\uce94\ud558\uae30 \uc704\ud574 \uce74\uba54\ub77c \uc0ac\uc6a9\uc774 \ud544\uc694\ud569\ub2c8\ub2e4.",
+          "cameraPermission": "로또 QR코드를 스캔하기 위해 카메라 사용이 필요합니다.",
           "recordAudioAndroid": false
         }
-      ]
+      ],
+      "expo-font"
     ],
     "ios": {
       "supportsTablet": true,
@@ -27,6 +29,10 @@
     "android": {
       "package": "com.randomlotto.app",
       "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      },
       "permissions": [
         "android.permission.CAMERA"
       ]

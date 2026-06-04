@@ -71,6 +71,18 @@ if ($AdMobAndroidAppId) {
   Set-Content -Encoding UTF8 $ManifestPath $UpdatedManifest
 }
 
+@(
+  "app\build\generated\assets\createBundleReleaseJsAndAssets",
+  "app\build\generated\sourcemaps\react\release",
+  "app\build\intermediates\assets\release",
+  "app\build\intermediates\sourcemaps\react\release"
+) | ForEach-Object {
+  $ReleaseBundleOutput = Join-Path $AndroidDir $_
+  if (Test-Path $ReleaseBundleOutput) {
+    Remove-Item -Recurse -Force -LiteralPath $ReleaseBundleOutput
+  }
+}
+
 Push-Location $AndroidDir
 try {
   if ($Type -eq "apk") {

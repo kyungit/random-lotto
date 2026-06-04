@@ -11,6 +11,8 @@ android/
 ios/
 .gradle-local/
 local-android-build.log
+keystores/
+release-outputs/
 
 npm-debug.log*
 yarn-debug.log*

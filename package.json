@@ -10,9 +10,11 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "build:android:dev": "npm run run:android:dev",
-    "build:android:apk": "npx eas-cli@latest build --platform android --profile preview",
-    "build:android:aab": "npx eas-cli@latest build --platform android --profile production",
+    "build:android:apk": "powershell -ExecutionPolicy Bypass -File scripts/build-android-release.ps1 apk",
+    "build:android:aab": "powershell -ExecutionPolicy Bypass -File scripts/build-android-release.ps1 aab",
     "eas:build:android:dev": "npx eas-cli@latest build --platform android --profile development",
+    "eas:build:android:apk": "npx eas-cli@latest build --platform android --profile preview",
+    "eas:build:android:aab": "npx eas-cli@latest build --platform android --profile production",
     "prebuild:android:dev": "cross-env EXPO_LOCAL_DEV_CLIENT=true JAVA_HOME=\"C:\\Program Files\\Android\\Android Studio\\jbr\" ANDROID_HOME=\"C:\\Users\\ehrud\\AppData\\Local\\Android\\Sdk\" ANDROID_SDK_ROOT=\"C:\\Users\\ehrud\\AppData\\Local\\Android\\Sdk\" GRADLE_USER_HOME=\"%TEMP%\\random-lotto-gradle\" npx expo prebuild --platform android",
     "run:android:dev": "cross-env EXPO_LOCAL_DEV_CLIENT=true JAVA_HOME=\"C:\\Program Files\\Android\\Android Studio\\jbr\" ANDROID_HOME=\"C:\\Users\\ehrud\\AppData\\Local\\Android\\Sdk\" ANDROID_SDK_ROOT=\"C:\\Users\\ehrud\\AppData\\Local\\Android\\Sdk\" GRADLE_USER_HOME=\"%TEMP%\\random-lotto-gradle\" npx expo run:android"
   },

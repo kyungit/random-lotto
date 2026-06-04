@@ -28,10 +28,13 @@ module.exports = ({ config }) => {
   loadEnvFile('.env');
   loadEnvFile('.env.admob.backup');
 
-  const androidAppId =
-    process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID ||
-    GOOGLE_MOBILE_ADS_ANDROID_TEST_APP_ID;
-  const iosAppId = process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID || GOOGLE_MOBILE_ADS_IOS_TEST_APP_ID;
+  const isDevelopmentBuild = process.env.EAS_BUILD_PROFILE === 'development';
+  const androidAppId = isDevelopmentBuild
+    ? GOOGLE_MOBILE_ADS_ANDROID_TEST_APP_ID
+    : process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID || GOOGLE_MOBILE_ADS_ANDROID_TEST_APP_ID;
+  const iosAppId = isDevelopmentBuild
+    ? GOOGLE_MOBILE_ADS_IOS_TEST_APP_ID
+    : process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID || GOOGLE_MOBILE_ADS_IOS_TEST_APP_ID;
   const plugins = [...(config.plugins || [])];
 
   const hasGoogleMobileAdsPlugin = plugins.some((plugin) =>

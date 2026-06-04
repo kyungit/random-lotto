@@ -616,7 +616,7 @@ export default function App() {
               onRefresh={fetchDraws}
             />
           )}
-          <AdBanner />
+          {tab === 'home' ? <AdBanner /> : null}
         </View>
       </SafeAreaView>
     </SafeAreaProvider>

@@ -207,21 +207,31 @@ function Ball({ number, size = 44, muted = false }) {
 
 function AdBanner() {
   const [adsModule, setAdsModule] = useState(null);
+  const [adStatus, setAdStatus] = useState(__DEV__ ? 'loading' : '');
 
   useEffect(() => {
     if (!ADS_ENABLED || Platform.OS === 'web') {
+      setAdStatus('');
       return;
     }
 
     try {
       const loadedAdsModule = require('react-native-google-mobile-ads');
+      loadedAdsModule.default?.().initialize?.();
       setAdsModule(loadedAdsModule);
     } catch (event) {
       setAdsModule(null);
+      setAdStatus(__DEV__ ? `AdMob module error: ${event?.message || 'unknown'}` : '');
     }
   }, []);
 
-  if (!adsModule) return null;
+  if (!adsModule) {
+    return __DEV__ && adStatus ? (
+      <View style={styles.adBannerWrap}>
+        <Text style={styles.adStatusText}>{adStatus}</Text>
+      </View>
+    ) : null;
+  }
 
   const unitId = __DEV__
     ? adsModule.TestIds.BANNER
@@ -238,8 +248,12 @@ function AdBanner() {
         unitId={unitId}
         size={BannerAdSize.BANNER}
         requestOptions={{ requestNonPersonalizedAdsOnly: true }}
-        onAdFailedToLoad={() => setAdsModule(null)}
+        onAdLoaded={() => setAdStatus('')}
+        onAdFailedToLoad={(event) => {
+          setAdStatus(__DEV__ ? `AdMob load error: ${event?.message || 'unknown'}` : '');
+        }}
       />
+      {__DEV__ && adStatus ? <Text style={styles.adStatusText}>{adStatus}</Text> : null}
     </View>
   );
 }
@@ -635,6 +649,13 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#F2F4F7',
     backgroundColor: '#FFFFFF',
+  },
+  adStatusText: {
+    color: '#98A2B3',
+    fontSize: 10,
+    fontWeight: '700',
+    paddingHorizontal: 12,
+    textAlign: 'center',
   },
   header: {
     paddingHorizontal: 22,

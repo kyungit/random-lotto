@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  NativeModules,
   Platform,
   Pressable,
   ScrollView,
@@ -55,13 +54,6 @@ const FIRST_DRAW_YEAR = 2002;
 const ADS_ENABLED = process.env.EXPO_PUBLIC_ENABLE_ADS === 'true';
 const ANDROID_BANNER_AD_UNIT_ID = process.env.EXPO_PUBLIC_ADMOB_BANNER_ANDROID || '';
 const IOS_BANNER_AD_UNIT_ID = process.env.EXPO_PUBLIC_ADMOB_BANNER_IOS || '';
-
-function hasGoogleMobileAdsNativeModule() {
-  return Boolean(
-    NativeModules.RNGoogleMobileAdsModule ||
-      NativeModules.RNGoogleMobileAdsNativeModule
-  );
-}
 
 function getNumberColor(number) {
   if (number <= 10) return '#F8C546';
@@ -217,7 +209,7 @@ function AdBanner() {
   const [adsModule, setAdsModule] = useState(null);
 
   useEffect(() => {
-    if (!ADS_ENABLED || Platform.OS === 'web' || !hasGoogleMobileAdsNativeModule()) {
+    if (!ADS_ENABLED || Platform.OS === 'web') {
       return;
     }
 
@@ -231,7 +223,11 @@ function AdBanner() {
 
   if (!adsModule) return null;
 
-  const unitId = Platform.OS === 'ios' ? IOS_BANNER_AD_UNIT_ID : ANDROID_BANNER_AD_UNIT_ID;
+  const unitId = __DEV__
+    ? adsModule.TestIds.BANNER
+    : Platform.OS === 'ios'
+      ? IOS_BANNER_AD_UNIT_ID
+      : ANDROID_BANNER_AD_UNIT_ID;
   if (!unitId) return null;
 
   const { BannerAd, BannerAdSize } = adsModule;

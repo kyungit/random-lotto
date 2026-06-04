@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
+const GOOGLE_MOBILE_ADS_ANDROID_TEST_APP_ID = 'ca-app-pub-3940256099942544~3347511713';
 const GOOGLE_MOBILE_ADS_IOS_TEST_APP_ID = 'ca-app-pub-3940256099942544~1458002511';
 
 function loadEnvFile(fileName) {
@@ -27,12 +28,19 @@ module.exports = ({ config }) => {
   loadEnvFile('.env');
   loadEnvFile('.env.admob.backup');
 
-  const enableAds = process.env.EXPO_PUBLIC_ENABLE_ADS === 'true';
-  const androidAppId = process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID || '';
+  const androidAppId =
+    process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID ||
+    GOOGLE_MOBILE_ADS_ANDROID_TEST_APP_ID;
   const iosAppId = process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID || GOOGLE_MOBILE_ADS_IOS_TEST_APP_ID;
   const plugins = [...(config.plugins || [])];
 
-  if (enableAds && androidAppId) {
+  const hasGoogleMobileAdsPlugin = plugins.some((plugin) =>
+    Array.isArray(plugin)
+      ? plugin[0] === 'react-native-google-mobile-ads'
+      : plugin === 'react-native-google-mobile-ads'
+  );
+
+  if (!hasGoogleMobileAdsPlugin) {
     plugins.push([
       'react-native-google-mobile-ads',
       {

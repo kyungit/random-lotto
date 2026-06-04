@@ -11,7 +11,9 @@
     "web": "expo start --web",
     "build:android:dev": "npx eas-cli@latest build --platform android --profile development",
     "build:android:apk": "npx eas-cli@latest build --platform android --profile preview",
-    "build:android:aab": "npx eas-cli@latest build --platform android --profile production"
+    "build:android:aab": "npx eas-cli@latest build --platform android --profile production",
+    "prebuild:android:dev": "cross-env EXPO_LOCAL_DEV_CLIENT=true npx expo prebuild --platform android",
+    "run:android:dev": "cross-env EXPO_LOCAL_DEV_CLIENT=true npx expo run:android"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -27,6 +29,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
-    "babel-preset-expo": "~54.0.0"
+    "babel-preset-expo": "~54.0.0",
+    "cross-env": "^10.1.0"
   }
 }

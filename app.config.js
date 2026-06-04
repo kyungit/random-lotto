@@ -28,7 +28,9 @@ module.exports = ({ config }) => {
   loadEnvFile('.env');
   loadEnvFile('.env.admob.backup');
 
-  const isDevelopmentBuild = process.env.EAS_BUILD_PROFILE === 'development';
+  const isDevelopmentBuild =
+    process.env.EAS_BUILD_PROFILE === 'development' ||
+    process.env.EXPO_LOCAL_DEV_CLIENT === 'true';
   const androidAppId = isDevelopmentBuild
     ? GOOGLE_MOBILE_ADS_ANDROID_TEST_APP_ID
     : process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID || GOOGLE_MOBILE_ADS_ANDROID_TEST_APP_ID;

@@ -11,7 +11,7 @@ $OutputDir = Join-Path $ProjectRoot "release-outputs"
 $KeystoreProps = Join-Path $ProjectRoot "keystores\release-signing.properties"
 $JavaHome = "C:\Program Files\Android\Android Studio\jbr"
 $AndroidSdk = Join-Path $env:LOCALAPPDATA "Android\Sdk"
-$GradleHome = Join-Path $env:TEMP "random-lotto-gradle"
+$GradleHome = Join-Path $env:TEMP "random-lotto-gradle-release"
 
 function Get-DotEnvValue {
   param([string]$Key)

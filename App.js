@@ -613,20 +613,22 @@ export default function App() {
             </Pressable>
           </View>
 
-          {tab === 'home' ? (
-            <HomeScreen numbers={numbers} onDraw={() => setNumbers(generateLottoNumbers())} />
-          ) : tab === 'qr' ? (
-            <QrScreen draws={draws} loading={loading} />
-          ) : (
-            <HistoryScreen
-              draws={draws}
-              loading={loading}
-              error={error}
-              topNumbers={topNumbers}
-              onRefresh={fetchDraws}
-            />
-          )}
-          {tab === 'home' ? <AdBanner /> : null}
+          <View style={styles.screenBody}>
+            {tab === 'home' ? (
+              <HomeScreen numbers={numbers} onDraw={() => setNumbers(generateLottoNumbers())} />
+            ) : tab === 'qr' ? (
+              <QrScreen draws={draws} loading={loading} />
+            ) : (
+              <HistoryScreen
+                draws={draws}
+                loading={loading}
+                error={error}
+                topNumbers={topNumbers}
+                onRefresh={fetchDraws}
+              />
+            )}
+          </View>
+          <AdBanner />
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -641,6 +643,9 @@ const styles = StyleSheet.create({
   app: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  screenBody: {
+    flex: 1,
   },
   adBannerWrap: {
     minHeight: 54,

@@ -11,7 +11,7 @@ $OutputDir = Join-Path $ProjectRoot "release-outputs"
 $KeystoreProps = Join-Path $ProjectRoot "keystores\release-signing.properties"
 $JavaHome = "C:\Program Files\Android\Android Studio\jbr"
 $AndroidSdk = Join-Path $env:LOCALAPPDATA "Android\Sdk"
-$GradleHome = Join-Path $env:TEMP "random-lotto-gradle-release"
+$GradleHome = Join-Path $ProjectRoot ".gradle-release"
 
 function Get-DotEnvValue {
   param([string]$Key)
@@ -41,6 +41,75 @@ function Get-DotEnvValue {
   return $null
 }
 
+function Export-AndroidLauncherIcons {
+  $IconPath = Join-Path $ProjectRoot "assets\icon.png"
+  $ResDir = Join-Path $AndroidDir "app\src\main\res"
+
+  if (!(Test-Path $IconPath) -or !(Test-Path $ResDir)) {
+    return
+  }
+
+  Add-Type -AssemblyName System.Drawing
+
+  $densities = @(
+    @{ Name = "mipmap-mdpi"; Scale = 1 },
+    @{ Name = "mipmap-hdpi"; Scale = 1.5 },
+    @{ Name = "mipmap-xhdpi"; Scale = 2 },
+    @{ Name = "mipmap-xxhdpi"; Scale = 3 },
+    @{ Name = "mipmap-xxxhdpi"; Scale = 4 }
+  )
+
+  $source = [System.Drawing.Image]::FromFile($IconPath)
+  try {
+    foreach ($density in $densities) {
+      $dir = Join-Path $ResDir $density.Name
+      New-Item -ItemType Directory -Force -Path $dir | Out-Null
+
+      foreach ($oldFile in @("ic_launcher.webp", "ic_launcher_round.webp", "ic_launcher_foreground.webp")) {
+        $oldPath = Join-Path $dir $oldFile
+        if (Test-Path $oldPath) {
+          Remove-Item -Force -LiteralPath $oldPath
+        }
+      }
+
+      $legacySize = [int](48 * $density.Scale)
+      $foregroundSize = [int](108 * $density.Scale)
+
+      Save-ResizedPng $source (Join-Path $dir "ic_launcher.png") $legacySize
+      Save-ResizedPng $source (Join-Path $dir "ic_launcher_round.png") $legacySize
+      Save-ResizedPng $source (Join-Path $dir "ic_launcher_foreground.png") $foregroundSize
+    }
+  } finally {
+    $source.Dispose()
+  }
+}
+
+function Save-ResizedPng {
+  param(
+    [System.Drawing.Image]$Source,
+    [string]$Path,
+    [int]$Size
+  )
+
+  $bitmap = New-Object System.Drawing.Bitmap $Size, $Size
+  try {
+    $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+    try {
+      $graphics.Clear([System.Drawing.Color]::White)
+      $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+      $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
+      $graphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
+      $graphics.DrawImage($Source, 0, 0, $Size, $Size)
+    } finally {
+      $graphics.Dispose()
+    }
+
+    $bitmap.Save($Path, [System.Drawing.Imaging.ImageFormat]::Png)
+  } finally {
+    $bitmap.Dispose()
+  }
+}
+
 if (!(Test-Path $AndroidDir)) {
   throw "android folder is missing. Run npm run prebuild:android:dev first."
 }
@@ -48,6 +117,8 @@ if (!(Test-Path $AndroidDir)) {
 if (!(Test-Path $KeystoreProps)) {
   throw "Release signing file is missing: $KeystoreProps"
 }
+
+Export-AndroidLauncherIcons
 
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 New-Item -ItemType Directory -Force -Path $GradleHome | Out-Null

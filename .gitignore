@@ -9,6 +9,7 @@ node_modules/
 dist/
 android/
 ios/
+.gradle-release/
 .gradle-local/
 local-android-build.log
 keystores/
